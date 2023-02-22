@@ -493,6 +493,7 @@ gpgkey=https://nginx.org/keys/nginx_signing.key
 module_hotfixes=true' > /etc/yum.repos.d/nginx.repo
             fi
         fi
+        echo "12313"
         $CMD_INSTALL nginx
         if [[ "$?" != "0" ]]; then
             colorEcho $RED " Nginx安装失败，请到 Github Issues 反馈"
