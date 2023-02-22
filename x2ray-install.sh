@@ -310,7 +310,7 @@ getData() {
         colorEcho ${BLUE}  " Nginx端口：$PORT"
         XPORT=`shuf -i10000-65000 -n1`
     fi
-
+    
     if [[ "$KCP" = "true" ]]; then
         echo ""
         colorEcho $BLUE " 请选择伪装类型："
@@ -1923,5 +1923,12 @@ case "$action" in
         echo " 用法: `basename $0` [menu|update|uninstall|start|restart|stop|showInfo|showLog]"
         ;;
 esac
+
+
+
+
+
+
+
 
 
