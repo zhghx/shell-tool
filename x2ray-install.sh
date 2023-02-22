@@ -480,6 +480,9 @@ installNginx() {
     colorEcho $BLUE " 安装nginx..."
     if [[ "$BT" = "false" ]]; then
         if [[ "$PMT" = "yum" ]]; then
+            echo `$CMD_INSTALL`
+            echo ">>>>>>>>>>>????????"
+
             $CMD_INSTALL epel-release
             if [[ "$?" != "0" ]]; then
                 echo '[nginx-stable]
