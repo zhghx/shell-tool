@@ -1,9 +1,9 @@
 #!/bin/bash
 
-RED="\033[31m"      # Error message
-GREEN="\033[32m"    # Success message
-YELLOW="\033[33m"   # Warning message
-BLUE="\033[36m"     # Info message
+RED="\033[31m"    # Error message
+GREEN="\033[32m"  # Success message
+YELLOW="\033[33m" # Warning message
+BLUE="\033[36m"   # Info message
 PLAIN='\033[0m'
 
 # 以下网站是随机从Google上找到的无广告小说网站，不喜欢请改成其他网址，以http或https开头
@@ -28,7 +28,7 @@ SITES=(
 )
 
 CONFIG_FILE="/usr/local/etc/xray/config.json"
-OS=`hostnamectl | grep -i system | cut -d: -f2`
+OS=$(hostnamectl | grep -i system | cut -d: -f2)
 
 IP=$(curl -s4m8 ip.p3terx.com | sed -n 1p)
 if [[ "$?" != "0" ]]; then
@@ -37,7 +37,7 @@ fi
 
 BT="false"
 NGINX_CONF_PATH="/etc/nginx/conf.d/"
-res=`which bt 2>/dev/null`
+res=$(which bt 2>/dev/null)
 if [[ "$res" != "" ]]; then
     BT="true"
     NGINX_CONF_PATH="/www/server/panel/vhost/nginx/"
@@ -57,9 +57,9 @@ checkSystem() {
         exit 1
     fi
 
-    res=`which yum 2>/dev/null`
+    res=$(which yum 2>/dev/null)
     if [[ "$?" != "0" ]]; then
-        res=`which apt 2>/dev/null`
+        res=$(which apt 2>/dev/null)
         if [[ "$?" != "0" ]]; then
             colorEcho $RED " 不受支持的Linux系统"
             exit 1
@@ -74,7 +74,7 @@ checkSystem() {
         CMD_REMOVE="yum remove -y "
         CMD_UPGRADE="yum update -y"
     fi
-    res=`which systemctl 2>/dev/null`
+    res=$(which systemctl 2>/dev/null)
     if [[ "$?" != "0" ]]; then
         colorEcho $RED " 系统版本过低，请升级到最新版本"
         exit 1
@@ -86,7 +86,7 @@ colorEcho() {
 }
 
 configNeedNginx() {
-    local ws=`grep wsSettings $CONFIG_FILE`
+    local ws=$(grep wsSettings $CONFIG_FILE)
     if [[ -z "$ws" ]]; then
         echo no
         return
@@ -111,17 +111,17 @@ status() {
         echo 1
         return
     fi
-    port=`grep port $CONFIG_FILE| head -n 1| cut -d: -f2| tr -d \",' '`
-    res=`ss -nutlp| grep ${port} | grep -i xray`
+    port=$(grep port $CONFIG_FILE | head -n 1 | cut -d: -f2 | tr -d \",' ')
+    res=$(ss -nutlp | grep ${port} | grep -i xray)
     if [[ -z "$res" ]]; then
         echo 2
         return
     fi
 
-    if [[ `configNeedNginx` != "yes" ]]; then
+    if [[ $(configNeedNginx) != "yes" ]]; then
         echo 3
     else
-        res=`ss -nutlp|grep -i nginx`
+        res=$(ss -nutlp | grep -i nginx)
         if [[ -z "$res" ]]; then
             echo 4
         else
@@ -131,37 +131,37 @@ status() {
 }
 
 statusText() {
-    res=`status`
+    res=$(status)
     case $res in
-        2)
-            echo -e ${GREEN}已安装${PLAIN} ${RED}未运行${PLAIN}
-            ;;
-        3)
-            echo -e ${GREEN}已安装${PLAIN} ${GREEN}Xray正在运行${PLAIN}
-            ;;
-        4)
-            echo -e ${GREEN}已安装${PLAIN} ${GREEN}Xray正在运行${PLAIN}, ${RED}Nginx未运行${PLAIN}
-            ;;
-        5)
-            echo -e ${GREEN}已安装${PLAIN} ${GREEN}Xray正在运行, Nginx正在运行${PLAIN}
-            ;;
-        *)
-            echo -e ${RED}未安装${PLAIN}
-            ;;
+    2)
+        echo -e ${GREEN}已安装${PLAIN} ${RED}未运行${PLAIN}
+        ;;
+    3)
+        echo -e ${GREEN}已安装${PLAIN} ${GREEN}Xray正在运行${PLAIN}
+        ;;
+    4)
+        echo -e ${GREEN}已安装${PLAIN} ${GREEN}Xray正在运行${PLAIN}, ${RED}Nginx未运行${PLAIN}
+        ;;
+    5)
+        echo -e ${GREEN}已安装${PLAIN} ${GREEN}Xray正在运行, Nginx正在运行${PLAIN}
+        ;;
+    *)
+        echo -e ${RED}未安装${PLAIN}
+        ;;
     esac
 }
 
 normalizeVersion() {
     if [ -n "$1" ]; then
         case "$1" in
-            v*)
-                echo "$1"
+        v*)
+            echo "$1"
             ;;
-            http*)
-                echo "v1.4.2"
+        http*)
+            echo "v1.4.2"
             ;;
-            *)
-                echo "v$1"
+        *)
+            echo "v$1"
             ;;
         esac
     else
@@ -171,77 +171,77 @@ normalizeVersion() {
 
 # 1: new Xray. 0: no. 1: yes. 2: not installed. 3: check failed.
 getVersion() {
-    VER=`/usr/local/bin/xray version | head -n1 | awk '{print $2}'`
+    VER=$(/usr/local/bin/xray version | head -n1 | awk '{print $2}')
     RETVAL=$?
     CUR_VER="$(normalizeVersion "$(echo "$VER" | head -n 1 | cut -d " " -f2)")"
     TAG_URL="https://api.github.com/repos/XTLS/Xray-core/releases/latest"
-    NEW_VER="$(normalizeVersion "$(curl -s "${TAG_URL}" --connect-timeout 10| grep 'tag_name' | cut -d\" -f4)")"
+    NEW_VER="$(normalizeVersion "$(curl -s "${TAG_URL}" --connect-timeout 10 | grep 'tag_name' | cut -d\" -f4)")"
 
     if [[ $? -ne 0 ]] || [[ $NEW_VER == "" ]]; then
         colorEcho $RED " 检查Xray版本信息失败，请检查网络"
         return 3
-    elif [[ $RETVAL -ne 0 ]];then
+    elif [[ $RETVAL -ne 0 ]]; then
         return 2
-    elif [[ $NEW_VER != $CUR_VER ]];then
+    elif [[ $NEW_VER != $CUR_VER ]]; then
         return 1
     fi
     return 0
 }
 
-archAffix(){
+archAffix() {
     case "$(uname -m)" in
-        i686|i386)
-            echo '32'
+    i686 | i386)
+        echo '32'
         ;;
-        x86_64|amd64)
-            echo '64'
+    x86_64 | amd64)
+        echo '64'
         ;;
-        armv5tel)
-            echo 'arm32-v5'
+    armv5tel)
+        echo 'arm32-v5'
         ;;
-        armv6l)
-            echo 'arm32-v6'
+    armv6l)
+        echo 'arm32-v6'
         ;;
-        armv7|armv7l)
-            echo 'arm32-v7a'
+    armv7 | armv7l)
+        echo 'arm32-v7a'
         ;;
-        armv8|aarch64)
-            echo 'arm64-v8a'
+    armv8 | aarch64)
+        echo 'arm64-v8a'
         ;;
-        mips64le)
-            echo 'mips64le'
+    mips64le)
+        echo 'mips64le'
         ;;
-        mips64)
-            echo 'mips64'
+    mips64)
+        echo 'mips64'
         ;;
-        mipsle)
-            echo 'mips32le'
+    mipsle)
+        echo 'mips32le'
         ;;
-        mips)
-            echo 'mips32'
+    mips)
+        echo 'mips32'
         ;;
-        ppc64le)
-            echo 'ppc64le'
+    ppc64le)
+        echo 'ppc64le'
         ;;
-        ppc64)
-            echo 'ppc64'
+    ppc64)
+        echo 'ppc64'
         ;;
-        ppc64le)
-            echo 'ppc64le'
+    ppc64le)
+        echo 'ppc64le'
         ;;
-        riscv64)
-            echo 'riscv64'
+    riscv64)
+        echo 'riscv64'
         ;;
-        s390x)
-            echo 's390x'
+    s390x)
+        echo 's390x'
         ;;
-        *)
-            colorEcho $RED " 不支持的CPU架构！"
-            exit 1
+    *)
+        colorEcho $RED " 不支持的CPU架构！"
+        exit 1
         ;;
     esac
 
-	return 0
+    return 0
 }
 
 getData() {
@@ -258,8 +258,7 @@ getData() {
         fi
 
         echo ""
-        while true
-        do
+        while true; do
             read -p " 请输入伪装域名：" DOMAIN
             if [[ -z "${DOMAIN}" ]]; then
                 colorEcho ${RED} " 域名输入错误，请重新输入！"
@@ -268,19 +267,19 @@ getData() {
             fi
         done
         DOMAIN=${DOMAIN,,}
-        colorEcho ${BLUE}  " 伪装域名(host)：$DOMAIN"
+        colorEcho ${BLUE} " 伪装域名(host)：$DOMAIN"
 
         echo ""
         if [[ -f ~/xray.pem && -f ~/xray.key ]]; then
-            colorEcho ${BLUE}  " 检测到自有证书，将使用其部署"
+            colorEcho ${BLUE} " 检测到自有证书，将使用其部署"
             CERT_FILE="/usr/local/etc/xray/${DOMAIN}.pem"
             KEY_FILE="/usr/local/etc/xray/${DOMAIN}.key"
         else
-            resolve=`curl -sL ipget.net/?ip=${DOMAIN}`
-            res=`echo -n ${resolve} | grep ${IP}`
+            resolve=$(curl -sL ipget.net/?ip=${DOMAIN})
+            res=$(echo -n ${resolve} | grep ${IP})
             if [[ -z "${res}" ]]; then
-                colorEcho ${BLUE}  "${DOMAIN} 解析结果：${resolve}"
-                colorEcho ${RED}  " 域名未解析到当前服务器IP(${IP})!"
+                colorEcho ${BLUE} "${DOMAIN} 解析结果：${resolve}"
+                colorEcho ${RED} " 域名未解析到当前服务器IP(${IP})!"
                 exit 1
             fi
         fi
@@ -293,22 +292,22 @@ getData() {
             [[ -z "${PORT}" ]] && PORT=443
         else
             read -p " 请输入xray监听端口[100-65535的一个数字]：" PORT
-            [[ -z "${PORT}" ]] && PORT=`shuf -i200-65000 -n1`
+            [[ -z "${PORT}" ]] && PORT=$(shuf -i200-65000 -n1)
             if [[ "${PORT:0:1}" = "0" ]]; then
-                colorEcho ${RED}  " 端口不能以0开头"
+                colorEcho ${RED} " 端口不能以0开头"
                 exit 1
             fi
         fi
-        colorEcho ${BLUE}  " xray端口：$PORT"
+        colorEcho ${BLUE} " xray端口：$PORT"
     else
         read -p " 请输入Nginx监听端口[100-65535的一个数字，默认443]：" PORT
         [[ -z "${PORT}" ]] && PORT=443
         if [ "${PORT:0:1}" = "0" ]; then
-            colorEcho ${BLUE}  " 端口不能以0开头"
+            colorEcho ${BLUE} " 端口不能以0开头"
             exit 1
         fi
-        colorEcho ${BLUE}  " Nginx端口：$PORT"
-        XPORT=`shuf -i10000-65000 -n1`
+        colorEcho ${BLUE} " Nginx端口：$PORT"
+        XPORT=$(shuf -i10000-65000 -n1)
     fi
 
     if [[ "$KCP" = "true" ]]; then
@@ -322,33 +321,33 @@ getData() {
         echo "   6) wiregard"
         read -p "  请选择伪装类型[默认：无]：" answer
         case $answer in
-            2)
-                HEADER_TYPE="utp"
-                ;;
-            3)
-                HEADER_TYPE="srtp"
-                ;;
-            4)
-                HEADER_TYPE="wechat-video"
-                ;;
-            5)
-                HEADER_TYPE="dtls"
-                ;;
-            6)
-                HEADER_TYPE="wireguard"
-                ;;
-            *)
-                HEADER_TYPE="none"
-                ;;
+        2)
+            HEADER_TYPE="utp"
+            ;;
+        3)
+            HEADER_TYPE="srtp"
+            ;;
+        4)
+            HEADER_TYPE="wechat-video"
+            ;;
+        5)
+            HEADER_TYPE="dtls"
+            ;;
+        6)
+            HEADER_TYPE="wireguard"
+            ;;
+        *)
+            HEADER_TYPE="none"
+            ;;
         esac
         colorEcho $BLUE " 伪装类型：$HEADER_TYPE"
-        SEED=`cat /proc/sys/kernel/random/uuid`
+        SEED=$(cat /proc/sys/kernel/random/uuid)
     fi
 
     if [[ "$TROJAN" = "true" ]]; then
         echo ""
         read -p " 请设置trojan密码（不输则随机生成）:" PASSWORD
-        [[ -z "$PASSWORD" ]] && PASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+        [[ -z "$PASSWORD" ]] && PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
         colorEcho $BLUE " trojan密码：$PASSWORD"
     fi
 
@@ -361,42 +360,41 @@ getData() {
         read -p " 请选择流控模式[默认:direct]" answer
         [[ -z "$answer" ]] && answer=1
         case $answer in
-            1)
-                FLOW="xtls-rprx-direct"
-                ;;
-            2)
-                FLOW="xtls-rprx-origin"
-                ;;
-            3)
-                FLOW="xtls-rprx-vision"
-                ;;
-            *)
-                colorEcho $RED " 无效选项，使用默认的xtls-rprx-direct"
-                FLOW="xtls-rprx-direct"
-                ;;
+        1)
+            FLOW="xtls-rprx-direct"
+            ;;
+        2)
+            FLOW="xtls-rprx-origin"
+            ;;
+        3)
+            FLOW="xtls-rprx-vision"
+            ;;
+        *)
+            colorEcho $RED " 无效选项，使用默认的xtls-rprx-direct"
+            FLOW="xtls-rprx-direct"
+            ;;
         esac
         colorEcho $BLUE " 流控模式：$FLOW"
     fi
 
     if [[ "${WS}" = "true" ]]; then
         echo ""
-        while true
-        do
+        while true; do
             read -p " 请输入伪装路径，以/开头(回车以自动生成)：" WSPATH
             if [[ -z "${WSPATH}" ]]; then
-                len=`shuf -i5-12 -n1`
-                ws=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $len | head -n 1`
+                len=$(shuf -i5-12 -n1)
+                ws=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $len | head -n 1)
                 WSPATH="/$ws"
                 break
             elif [[ "${WSPATH:0:1}" != "/" ]]; then
-                colorEcho ${RED}  " 伪装路径必须以/开头！"
+                colorEcho ${RED} " 伪装路径必须以/开头！"
             elif [[ "${WSPATH}" = "/" ]]; then
-                colorEcho ${RED}   " 不能使用根路径！"
+                colorEcho ${RED} " 不能使用根路径！"
             else
                 break
             fi
         done
-        colorEcho ${BLUE}  " ws路径：$WSPATH"
+        colorEcho ${BLUE} " ws路径：$WSPATH"
     fi
 
     if [[ "$TLS" = "true" || "$XTLS" = "true" ]]; then
@@ -418,15 +416,14 @@ getData() {
             2)
                 len=${#SITES[@]}
                 ((len--))
-                while true
-                do
-                    index=`shuf -i0-${len} -n1`
+                while true; do
+                    index=$(shuf -i0-${len} -n1)
                     PROXY_URL=${SITES[$index]}
-                    host=`echo ${PROXY_URL} | cut -d/ -f3`
-                    ip=`curl -sL ipget.net/?ip=${host}`
-                    res=`echo -n ${ip} | grep ${host}`
+                    host=$(echo ${PROXY_URL} | cut -d/ -f3)
+                    ip=$(curl -sL ipget.net/?ip=${host})
+                    res=$(echo -n ${ip} | grep ${host})
                     if [[ "${res}" = "" ]]; then
-                        echo "$ip $host" >> /etc/hosts
+                        echo "$ip $host" >>/etc/hosts
                         break
                     fi
                 done
@@ -450,9 +447,10 @@ getData() {
             *)
                 colorEcho $RED " 请输入正确的选项！"
                 exit 1
+                ;;
             esac
         fi
-        REMOTE_HOST=`echo ${PROXY_URL} | cut -d/ -f3`
+        REMOTE_HOST=$(echo ${PROXY_URL} | cut -d/ -f3)
         colorEcho $BLUE " 伪装网站：$PROXY_URL"
 
         echo ""
@@ -490,10 +488,9 @@ baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
 gpgcheck=1
 enabled=1
 gpgkey=https://nginx.org/keys/nginx_signing.key
-module_hotfixes=true' > /etc/yum.repos.d/nginx.repo
+module_hotfixes=true' >/etc/yum.repos.d/nginx.repo
             fi
         fi
-        echo "12313"
         $CMD_INSTALL nginx
         if [[ "$?" != "0" ]]; then
             colorEcho $RED " Nginx安装失败，请到 Github Issues 反馈"
@@ -501,7 +498,7 @@ module_hotfixes=true' > /etc/yum.repos.d/nginx.repo
         fi
         systemctl enable nginx
     else
-        res=`which nginx 2>/dev/null`
+        res=$(which nginx 2>/dev/null)
         if [[ "$?" != "0" ]]; then
             colorEcho $RED " 您安装了宝塔，请在宝塔后台安装nginx后再运行本脚本"
             exit 1
@@ -521,7 +518,7 @@ stopNginx() {
     if [[ "$BT" = "false" ]]; then
         systemctl stop nginx
     else
-        res=`ps aux | grep -i nginx`
+        res=$(ps aux | grep -i nginx)
         if [[ "$res" != "" ]]; then
             nginx -s stop
         fi
@@ -533,9 +530,9 @@ getCert() {
     if [[ -z ${CERT_FILE+x} ]]; then
         stopNginx
         systemctl stop xray
-        res=`netstat -ntlp| grep -E ':80 |:443 '`
+        res=$(netstat -ntlp | grep -E ':80 |:443 ')
         if [[ "${res}" != "" ]]; then
-            colorEcho ${RED}  " 其他进程占用了80或443端口，请先关闭再运行一键脚本"
+            colorEcho ${RED} " 其他进程占用了80或443端口，请先关闭再运行一键脚本"
             echo " 端口占用信息如下："
             echo ${res}
             exit 1
@@ -553,11 +550,11 @@ getCert() {
         fi
         curl -sL https://get.acme.sh | sh -s email=hijk.pw@protonmail.sh
         source ~/.bashrc
-        ~/.acme.sh/acme.sh  --upgrade  --auto-upgrade
+        ~/.acme.sh/acme.sh --upgrade --auto-upgrade
         ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
         if [[ "$BT" = "false" ]]; then
             if [[ -n $(echo $IP | grep ":") ]]; then
-                ~/.acme.sh/acme.sh   --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx" --standalone --listen-v6
+                ~/.acme.sh/acme.sh --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx" --standalone --listen-v6
             else
                 ~/.acme.sh/acme.sh --issue -d $DOMAIN --keylength ec-256 --pre-hook "systemctl stop nginx" --post-hook "systemctl restart nginx" --standalone
             fi
@@ -574,10 +571,10 @@ getCert() {
         }
         CERT_FILE="/usr/local/etc/xray/${DOMAIN}.pem"
         KEY_FILE="/usr/local/etc/xray/${DOMAIN}.key"
-        ~/.acme.sh/acme.sh  --install-cert -d $DOMAIN --ecc \
-            --key-file       $KEY_FILE  \
+        ~/.acme.sh/acme.sh --install-cert -d $DOMAIN --ecc \
+            --key-file $KEY_FILE \
             --fullchain-file $CERT_FILE \
-            --reloadcmd     "service nginx force-reload"
+            --reloadcmd "service nginx force-reload"
         [[ -f $CERT_FILE && -f $KEY_FILE ]] || {
             colorEcho $RED " 获取证书失败，请到 Github Issues 反馈"
             exit 1
@@ -589,10 +586,10 @@ getCert() {
 }
 
 configNginx() {
-    mkdir -p /usr/share/nginx/html;
+    mkdir -p /usr/share/nginx/html
     if [[ "$ALLOW_SPIDER" = "n" ]]; then
-        echo 'User-Agent: *' > /usr/share/nginx/html/robots.txt
-        echo 'Disallow: /' >> /usr/share/nginx/html/robots.txt
+        echo 'User-Agent: *' >/usr/share/nginx/html/robots.txt
+        echo 'Disallow: /' >>/usr/share/nginx/html/robots.txt
         ROBOT_CONFIG="    location = /robots.txt {}"
     else
         ROBOT_CONFIG=""
@@ -602,13 +599,13 @@ configNginx() {
         if [[ ! -f /etc/nginx/nginx.conf.bak ]]; then
             mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
         fi
-        res=`id nginx 2>/dev/null`
+        res=$(id nginx 2>/dev/null)
         if [[ "$?" != "0" ]]; then
             user="www-data"
         else
             user="nginx"
         fi
-        cat > /etc/nginx/nginx.conf<<-EOF
+        cat >/etc/nginx/nginx.conf <<-EOF
 user $user;
 worker_processes auto;
 error_log /var/log/nginx/error.log;
@@ -662,7 +659,7 @@ EOF
         # VMESS+WS+TLS
         # VLESS+WS+TLS
         if [[ "$WS" = "true" ]]; then
-            cat > ${NGINX_CONF_PATH}${DOMAIN}.conf<<-EOF
+            cat >${NGINX_CONF_PATH}${DOMAIN}.conf <<-EOF
 server {
     listen 80;
     listen [::]:80;
@@ -709,7 +706,7 @@ EOF
             # VLESS+TCP+TLS
             # VLESS+TCP+XTLS
             # trojan
-            cat > ${NGINX_CONF_PATH}${DOMAIN}.conf<<-EOF
+            cat >${NGINX_CONF_PATH}${DOMAIN}.conf <<-EOF
 server {
     listen 80;
     listen [::]:80;
@@ -734,10 +731,10 @@ setSelinux() {
 }
 
 setFirewall() {
-    res=`which firewall-cmd 2>/dev/null`
+    res=$(which firewall-cmd 2>/dev/null)
     if [[ $? -eq 0 ]]; then
-        systemctl status firewalld > /dev/null 2>&1
-        if [[ $? -eq 0 ]];then
+        systemctl status firewalld >/dev/null 2>&1
+        if [[ $? -eq 0 ]]; then
             firewall-cmd --permanent --add-service=http
             firewall-cmd --permanent --add-service=https
             if [[ "$PORT" != "443" ]]; then
@@ -746,7 +743,7 @@ setFirewall() {
             fi
             firewall-cmd --reload
         else
-            nl=`iptables -nL | nl | grep FORWARD | awk '{print $1}'`
+            nl=$(iptables -nL | nl | grep FORWARD | awk '{print $1}')
             if [[ "$nl" != "3" ]]; then
                 iptables -I INPUT -p tcp --dport 80 -j ACCEPT
                 iptables -I INPUT -p tcp --dport 443 -j ACCEPT
@@ -757,9 +754,9 @@ setFirewall() {
             fi
         fi
     else
-        res=`which iptables 2>/dev/null`
+        res=$(which iptables 2>/dev/null)
         if [[ $? -eq 0 ]]; then
-            nl=`iptables -nL | nl | grep FORWARD | awk '{print $1}'`
+            nl=$(iptables -nL | nl | grep FORWARD | awk '{print $1}')
             if [[ "$nl" != "3" ]]; then
                 iptables -I INPUT -p tcp --dport 80 -j ACCEPT
                 iptables -I INPUT -p tcp --dport 443 -j ACCEPT
@@ -769,9 +766,9 @@ setFirewall() {
                 fi
             fi
         else
-            res=`which ufw 2>/dev/null`
+            res=$(which ufw 2>/dev/null)
             if [[ $? -eq 0 ]]; then
-                res=`ufw status | grep -i inactive`
+                res=$(ufw status | grep -i inactive)
                 if [[ "$res" = "" ]]; then
                     ufw allow http/tcp
                     ufw allow https/tcp
@@ -796,15 +793,15 @@ installBBR() {
         INSTALL_BBR=false
         return
     fi
-    res=`hostnamectl | grep -i openvz`
+    res=$(hostnamectl | grep -i openvz)
     if [[ "$res" != "" ]]; then
         colorEcho $BLUE " openvz机器，跳过安装"
         INSTALL_BBR=false
         return
     fi
 
-    echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+    echo "net.core.default_qdisc=fq" >>/etc/sysctl.conf
+    echo "net.ipv4.tcp_congestion_control=bbr" >>/etc/sysctl.conf
     sysctl -p
     result=$(lsmod | grep bbr)
     if [[ "$result" != "" ]]; then
@@ -820,12 +817,12 @@ installBBR() {
         $CMD_INSTALL --enablerepo=elrepo-kernel kernel-ml
         $CMD_REMOVE kernel-3.*
         grub2-set-default 0
-        echo "tcp_bbr" >> /etc/modules-load.d/modules.conf
+        echo "tcp_bbr" >>/etc/modules-load.d/modules.conf
         INSTALL_BBR=true
     else
         $CMD_INSTALL --install-recommends linux-generic-hwe-16.04
         grub-set-default 0
-        echo "tcp_bbr" >> /etc/modules-load.d/modules.conf
+        echo "tcp_bbr" >>/etc/modules-load.d/modules.conf
         INSTALL_BBR=true
     fi
 }
@@ -836,13 +833,13 @@ installXray() {
     DOWNLOAD_LINK="https://github.com/XTLS/Xray-core/releases/download/${NEW_VER}/Xray-linux-$(archAffix).zip"
     colorEcho $BLUE " 下载Xray: ${DOWNLOAD_LINK}"
     curl -L -H "Cache-Control: no-cache" -o /tmp/xray/xray.zip ${DOWNLOAD_LINK}
-    if [ $? != 0 ];then
+    if [ $? != 0 ]; then
         colorEcho $RED " 下载Xray文件失败，请检查服务器网络设置"
         exit 1
     fi
     systemctl stop xray
-    mkdir -p /usr/local/etc/xray /usr/local/share/xray && \
-    unzip /tmp/xray/xray.zip -d /tmp/xray
+    mkdir -p /usr/local/etc/xray /usr/local/share/xray &&
+        unzip /tmp/xray/xray.zip -d /tmp/xray
     cp /tmp/xray/xray /usr/local/bin
     cp /tmp/xray/geo* /usr/local/share/xray
     chmod +x /usr/local/bin/xray || {
@@ -850,7 +847,7 @@ installXray() {
         exit 1
     }
 
-    cat >/etc/systemd/system/xray.service<<-EOF
+    cat >/etc/systemd/system/xray.service <<-EOF
 [Unit]
 Description=Xray Service
 Documentation=https://github.com/xtls https://hijk.art
@@ -874,7 +871,7 @@ EOF
 }
 
 trojanConfig() {
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -924,7 +921,7 @@ EOF
 }
 
 trojanXTLSConfig() {
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -976,8 +973,8 @@ EOF
 
 vmessConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    local alterid=`shuf -i50-80 -n1`
-    cat > $CONFIG_FILE<<-EOF
+    local alterid=$(shuf -i50-80 -n1)
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1006,8 +1003,8 @@ EOF
 
 vmessKCPConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    local alterid=`shuf -i50-80 -n1`
-    cat > $CONFIG_FILE<<-EOF
+    local alterid=$(shuf -i50-80 -n1)
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1048,7 +1045,7 @@ EOF
 
 vmessTLSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1092,7 +1089,7 @@ EOF
 
 vmessWSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $XPORT,
@@ -1132,7 +1129,7 @@ EOF
 
 vlessTLSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1185,7 +1182,7 @@ EOF
 
 vlessXTLSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1239,7 +1236,7 @@ EOF
 
 vlessWSConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $XPORT,
@@ -1279,7 +1276,7 @@ EOF
 
 vlessKCPConfig() {
     local uuid="$(cat '/proc/sys/kernel/random/uuid')"
-    cat > $CONFIG_FILE<<-EOF
+    cat >$CONFIG_FILE <<-EOF
 {
   "inbounds": [{
     "port": $PORT,
@@ -1379,7 +1376,7 @@ install() {
     if [[ "$PMT" = "apt" ]]; then
         $CMD_INSTALL libssl-dev g++
     fi
-    res=`which unzip 2>/dev/null`
+    res=$(which unzip 2>/dev/null)
     if [[ $? -ne 0 ]]; then
         colorEcho $RED " unzip安装失败，请检查网络"
         exit 1
@@ -1427,7 +1424,7 @@ bbrReboot() {
 }
 
 update() {
-    res=`status`
+    res=$(status)
     if [[ $res -lt 2 ]]; then
         colorEcho $RED " Xray未安装，请先安装！"
         return
@@ -1450,7 +1447,7 @@ update() {
 }
 
 uninstall() {
-    res=`status`
+    res=$(status)
     if [[ $res -lt 2 ]]; then
         colorEcho $RED " Xray未安装，请先安装！"
         return
@@ -1459,9 +1456,9 @@ uninstall() {
     echo ""
     read -p " 确定卸载Xray？[y/n]：" answer
     if [[ "${answer,,}" = "y" ]]; then
-        domain=`grep Host $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+        domain=$(grep Host $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
         if [[ "$domain" = "" ]]; then
-            domain=`grep serverName $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+            domain=$(grep serverName $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
         fi
 
         stop
@@ -1490,7 +1487,7 @@ uninstall() {
 }
 
 start() {
-    res=`status`
+    res=$(status)
     if [[ $res -lt 2 ]]; then
         colorEcho $RED " Xray未安装，请先安装！"
         return
@@ -1500,8 +1497,8 @@ start() {
     systemctl restart xray
     sleep 2
 
-    port=`grep port $CONFIG_FILE| head -n 1| cut -d: -f2| tr -d \",' '`
-    res=`ss -nutlp| grep ${port} | grep -i xray`
+    port=$(grep port $CONFIG_FILE | head -n 1 | cut -d: -f2 | tr -d \",' ')
+    res=$(ss -nutlp | grep ${port} | grep -i xray)
     if [[ "$res" = "" ]]; then
         colorEcho $RED " Xray启动失败，请检查日志或查看端口是否被占用！"
     else
@@ -1515,9 +1512,8 @@ stop() {
     colorEcho $BLUE " Xray停止成功"
 }
 
-
 restart() {
-    res=`status`
+    res=$(status)
     if [[ $res -lt 2 ]]; then
         colorEcho $RED " Xray未安装，请先安装！"
         return
@@ -1526,7 +1522,6 @@ restart() {
     stop
     start
 }
-
 
 getConfigFileInfo() {
     vless="false"
@@ -1537,50 +1532,50 @@ getConfigFileInfo() {
     protocol="VMess"
     kcp="false"
 
-    uid=`grep id $CONFIG_FILE | head -n1| cut -d: -f2 | tr -d \",' '`
-    alterid=`grep alterId $CONFIG_FILE  | cut -d: -f2 | tr -d \",' '`
-    network=`grep network $CONFIG_FILE  | tail -n1| cut -d: -f2 | tr -d \",' '`
+    uid=$(grep id $CONFIG_FILE | head -n1 | cut -d: -f2 | tr -d \",' ')
+    alterid=$(grep alterId $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
+    network=$(grep network $CONFIG_FILE | tail -n1 | cut -d: -f2 | tr -d \",' ')
     [[ -z "$network" ]] && network="tcp"
-    domain=`grep serverName $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+    domain=$(grep serverName $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
     if [[ "$domain" = "" ]]; then
-        domain=`grep Host $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+        domain=$(grep Host $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
         if [[ "$domain" != "" ]]; then
             ws="true"
             tls="true"
-            wspath=`grep path $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+            wspath=$(grep path $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
         fi
     else
         tls="true"
     fi
     if [[ "$ws" = "true" ]]; then
-        port=`grep -i ssl $NGINX_CONF_PATH${domain}.conf| head -n1 | awk '{print $2}'`
+        port=$(grep -i ssl $NGINX_CONF_PATH${domain}.conf | head -n1 | awk '{print $2}')
     else
-        port=`grep port $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+        port=$(grep port $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
     fi
-    res=`grep -i kcp $CONFIG_FILE`
+    res=$(grep -i kcp $CONFIG_FILE)
     if [[ "$res" != "" ]]; then
         kcp="true"
-        type=`grep header -A 3 $CONFIG_FILE | grep 'type' | cut -d: -f2 | tr -d \",' '`
-        seed=`grep seed $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+        type=$(grep header -A 3 $CONFIG_FILE | grep 'type' | cut -d: -f2 | tr -d \",' ')
+        seed=$(grep seed $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
     fi
 
-    vmess=`grep vmess $CONFIG_FILE`
+    vmess=$(grep vmess $CONFIG_FILE)
     if [[ "$vmess" = "" ]]; then
-        trojan=`grep trojan $CONFIG_FILE`
+        trojan=$(grep trojan $CONFIG_FILE)
         if [[ "$trojan" = "" ]]; then
             vless="true"
             protocol="VLESS"
         else
             trojan="true"
-            password=`grep password $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+            password=$(grep password $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
             protocol="trojan"
         fi
         tls="true"
         encryption="none"
-        xtls=`grep xtlsSettings $CONFIG_FILE`
+        xtls=$(grep xtlsSettings $CONFIG_FILE)
         if [[ "$xtls" != "" ]]; then
             xtls="true"
-            flow=`grep flow $CONFIG_FILE | cut -d: -f2 | tr -d \",' '`
+            flow=$(grep flow $CONFIG_FILE | cut -d: -f2 | tr -d \",' ')
         else
             flow="无"
         fi
@@ -1601,7 +1596,7 @@ outputVmess() {
   \"path\":\"\",
   \"tls\":\"\"
 }"
-    link=`echo -n ${raw} | base64 -w 0`
+    link=$(echo -n ${raw} | base64 -w 0)
     link="vmess://${link}"
 
     echo -e "   ${BLUE}IP(address): ${PLAIN} ${RED}${IP}${PLAIN}"
@@ -1657,7 +1652,7 @@ outputVmessTLS() {
   \"path\":\"\",
   \"tls\":\"tls\"
 }"
-    link=`echo -n ${raw} | base64 -w 0`
+    link=$(echo -n ${raw} | base64 -w 0)
     link="vmess://${link}"
     echo -e "   ${BLUE}IP(address): ${PLAIN} ${RED}${IP}${PLAIN}"
     echo -e "   ${BLUE}端口(port)：${PLAIN}${RED}${port}${PLAIN}"
@@ -1685,7 +1680,7 @@ outputVmessWS() {
   \"path\":\"${wspath}\",
   \"tls\":\"tls\"
 }"
-    link=`echo -n ${raw} | base64 -w 0`
+    link=$(echo -n ${raw} | base64 -w 0)
     link="vmess://${link}"
 
     echo -e "   ${BLUE}IP(address): ${PLAIN} ${RED}${IP}${PLAIN}"
@@ -1703,7 +1698,7 @@ outputVmessWS() {
 }
 
 showInfo() {
-    res=`status`
+    res=$(status)
     if [[ $res -lt 2 ]]; then
         colorEcho $RED " Xray未安装，请先安装！"
         return
@@ -1781,7 +1776,7 @@ showInfo() {
 }
 
 showLog() {
-    res=`status`
+    res=$(status)
     if [[ $res -lt 2 ]]; then
         colorEcho $RED " Xray未安装，请先安装！"
         return
@@ -1831,83 +1826,83 @@ menu() {
 
     read -p " 请选择操作 [0-17]：" answer
     case $answer in
-        0)
-            exit 0
-            ;;
-        1)
-            install
-            ;;
-        2)
-            KCP="true"
-            install
-            ;;
-        3)
-            TLS="true"
-            install
-            ;;
-        4)
-            TLS="true"
-            WS="true"
-            install
-            ;;
-        5)
-            VLESS="true"
-            KCP="true"
-            install
-            ;;
-        6)
-            VLESS="true"
-            TLS="true"
-            install
-            ;;
-        7)
-            VLESS="true"
-            TLS="true"
-            WS="true"
-            install
-            ;;
-        8)
-            VLESS="true"
-            TLS="true"
-            XTLS="true"
-            install
-            ;;
-        9)
-            TROJAN="true"
-            TLS="true"
-            install
-            ;;
-        10)
-            TROJAN="true"
-            TLS="true"
-            XTLS="true"
-            install
-            ;;
-        11)
-            update
-            ;;
-        12)
-            uninstall
-            ;;
-        13)
-            start
-            ;;
-        14)
-            restart
-            ;;
-        15)
-            stop
-            ;;
-        16)
-            showInfo
-            ;;
-        17)
-            showLog
-            ;;
-        *)
-            colorEcho $RED " 请选择正确的操作！"
-            exit 1
-            ;;
+    0)
+        exit 0
+        ;;
+    1)
+        install
+        ;;
+    2)
+        KCP="true"
+        install
+        ;;
+    3)
+        TLS="true"
+        install
+        ;;
+    4)
+        TLS="true"
+        WS="true"
+        install
+        ;;
+    5)
+        VLESS="true"
+        KCP="true"
+        install
+        ;;
+    6)
+        VLESS="true"
+        TLS="true"
+        install
+        ;;
+    7)
+        VLESS="true"
+        TLS="true"
+        WS="true"
+        install
+        ;;
+    8)
+        VLESS="true"
+        TLS="true"
+        XTLS="true"
+        install
+        ;;
+    9)
+        TROJAN="true"
+        TLS="true"
+        install
+        ;;
+    10)
+        TROJAN="true"
+        TLS="true"
+        XTLS="true"
+        install
+        ;;
+    11)
+        update
+        ;;
+    12)
+        uninstall
+        ;;
+    13)
+        start
+        ;;
+    14)
+        restart
+        ;;
+    15)
+        stop
+        ;;
+    16)
+        showInfo
+        ;;
+    17)
+        showLog
+        ;;
+    *)
+        colorEcho $RED " 请选择正确的操作！"
+        exit 1
+        ;;
     esac
 }
 
