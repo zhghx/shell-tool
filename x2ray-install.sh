@@ -480,9 +480,6 @@ installNginx() {
     colorEcho $BLUE " 安装nginx..."
     if [[ "$BT" = "false" ]]; then
         if [[ "$PMT" = "yum" ]]; then
-            echo `$CMD_INSTALL`
-            echo ">>>>>>>>>>>????????"
-
             $CMD_INSTALL epel-release
             if [[ "$?" != "0" ]]; then
                 echo '[nginx-stable]
@@ -494,6 +491,10 @@ gpgkey=https://nginx.org/keys/nginx_signing.key
 module_hotfixes=true' >/etc/yum.repos.d/nginx.repo
             fi
         fi
+
+        echo $($CMD_INSTALL)
+        echo ">>>>>>>>>>>????????"
+
         $CMD_INSTALL nginx
         if [[ "$?" != "0" ]]; then
             colorEcho $RED " Nginx安装失败，请到 Github Issues 反馈"
