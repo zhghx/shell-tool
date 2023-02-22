@@ -1923,5 +1923,6 @@ menu() {
 #        echo " 用法: `basename $0` [menu|update|uninstall|start|restart|stop|showInfo|showLog]"
 #        ;;
 #esac
+echo "start"
 
 installNginx
