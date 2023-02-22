@@ -477,7 +477,7 @@ getData() {
 
 installNginx() {
     echo ""
-    colorEcho $BLUE " 安装nginx..."
+    colorEcho $BLUE " 2安装nginx..."
     if [[ "$BT" = "false" ]]; then
         if [[ "$PMT" = "yum" ]]; then
             $CMD_INSTALL epel-release
