@@ -475,6 +475,9 @@ getData() {
     colorEcho $BLUE " 安装BBR：$NEED_BBR"
 }
 
+# 使用源码安装
+# 前提需要安装 编译器 apt-get install g++
+
 installNginx() {
     echo ""
     colorEcho $BLUE " 3安装nginx..."
