@@ -90,8 +90,8 @@ http {
         location /.well-known/pki-validation/61D22919D27E9B245AED0E7B1D949B59.txt {
             default_type text/html;
             return 200 '865E005EC46E8432E2A78A53C77AA6C7D2729E8E4BAD332997B4F513DB75B56E
-            sectigo.com
-            t0523873001677076078';
+sectigo.com
+t0523873001677076078';
         }
     }
 
