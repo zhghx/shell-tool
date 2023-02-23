@@ -87,18 +87,16 @@ http {
             root   html;
         }
 
-        location /.well-known/pki-validation/61D22919D27E9B245AED0E7B1D949B59.txt {
+        location /ping {
             default_type text/html;
-            return 200 '865E005EC46E8432E2A78A53C77AA6C7D2729E8E4BAD332997B4F513DB75B56E
-sectigo.com
-t0523873001677076078';
+            return 200 'TEST OK';
         }
     }
 
     server {
         listen       443 ssl http2;
         listen       [::]:443 ssl http2;
-        server_name dev.haoxuan.click;
+        server_name www.haoxuan.click;
         charset utf-8;
 
         # ssl配置
@@ -109,8 +107,8 @@ t0523873001677076078';
         ssl_session_cache shared:SSL:10m;
         ssl_session_timeout 10m;
         ssl_session_tickets off;
-        ssl_certificate /usr/local/etc/xray/custom.pem;
-        ssl_certificate_key /usr/local/etc/xray/custom.key;
+        ssl_certificate /usr/local/etc/xray/haoxuan_click.crt;
+        ssl_certificate_key /usr/local/etc/xray/haoxuan_click.key;
 
         root /usr/share/nginx/html;
         location / {
