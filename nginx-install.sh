@@ -28,6 +28,10 @@
 #  nginx http uwsgi temporary files: "uwsgi_temp"
 #  nginx http scgi temporary files: "scgi_temp"
 
+######## Run Bash ########
+# bash <(curl -sL https://raw.githubusercontent.com/zhghx/shell-tool/main/nginx-install.sh)
+######## Run Bash ########
+
 cd ~
 
 NGINX_DIR=nginx-1.22.1
