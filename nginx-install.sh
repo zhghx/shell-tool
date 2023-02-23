@@ -39,6 +39,10 @@ deleteDownloadFile() {
     sudo rm -rf ~/${NGINX_DIR}.tar.gz
 }
 
+downloadFile() {
+    wget http://nginx.org/download/${NGINX_DIR}.tar.gz
+}
+
 resetNginxFile() {
     sudo rm -rf /usr/bin/nginx # link file
     sudo rm -rf /usr/local/nginx
@@ -55,8 +59,7 @@ cd ~
 
 deleteDownloadFile
 resetNginxFile
-
-wget http://nginx.org/download/${NGINX_DIR}.tar.gz
+downloadFile
 
 sudo tar -zxvf ./${NGINX_DIR}.tar.gz
 
