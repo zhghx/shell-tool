@@ -34,6 +34,8 @@
 
 NGINX_DIR=nginx-1.22.1
 
+CONFIG_FILE="/usr/local/nginx/conf/nginx.conf"
+
 deleteDownloadFile() {
     sudo rm -rf ~/${NGINX_DIR}
     sudo rm -rf ~/${NGINX_DIR}.tar.gz
@@ -55,6 +57,75 @@ resetNginxFile() {
     sudo rm -rf /usr/local/nginx/logs/access.log
 }
 
+resetNginxConfig() {
+    cat > $CONFIG_FILE<<-EOF
+#server {
+#    listen 80;
+#    listen [::]:80;
+#    server_name dev.haoxuan.click;
+#    return 301 https://$server_name:443$request_uri;
+#}
+
+server {
+    listen       80;
+    server_name  dev.haoxuan.click;
+    location / {
+        root   html;
+        index  index.html index.htm;
+    }
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+    location /.well-known/pki-validation/61D22919D27E9B245AED0E7B1D949B59.txt {
+        default_type text/html;
+        return 200 '865E005EC46E8432E2A78A53C77AA6C7D2729E8E4BAD332997B4F513DB75B56E
+                    sectigo.com
+                    t0523873001677076078';
+    }
+}
+
+server {
+    listen       443 ssl http2;
+    listen       [::]:443 ssl http2;
+    server_name dev.haoxuan.click;
+    charset utf-8;
+
+    # ssl配置
+    ssl_protocols TLSv1.1 TLSv1.2;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    ssl_ecdh_curve secp384r1;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_session_tickets off;
+    ssl_certificate /usr/local/etc/xray/custom.pem;
+    ssl_certificate_key /usr/local/etc/xray/custom.key;
+
+    root /usr/share/nginx/html;
+    location / {
+        proxy_ssl_server_name on;
+        proxy_pass https://maimai.sega.jp;
+        proxy_set_header Accept-Encoding '';
+        sub_filter "maimai.sega.jp" "dev.haoxuan.click";
+        sub_filter_once off;
+    }
+    location = /robots.txt {}
+
+    location /PiFCkYk8IGLA {
+      proxy_redirect off;
+      proxy_pass http://127.0.0.1:50553;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+EOF
+}
+
 cd ~
 
 deleteDownloadFile
@@ -71,5 +142,7 @@ sudo make
 sudo make install
 
 deleteDownloadFile
+
+resetNginxConfig
 
 sudo ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx
