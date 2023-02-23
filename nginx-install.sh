@@ -40,6 +40,7 @@ deleteDownloadFile() {
 }
 
 resetNginxFile() {
+    sudo rm -rf /usr/bin/nginx # link file
     sudo rm -rf /usr/local/nginx
     sudo rm -rf /usr/local/nginx/sbin/nginx
     sudo rm -rf /usr/local/nginx/modules
@@ -67,3 +68,5 @@ sudo make
 sudo make install
 
 deleteDownloadFile
+
+sudo ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx
