@@ -143,6 +143,6 @@ sudo make install
 
 deleteDownloadFile
 
-resetNginxConfig
+#resetNginxConfig
 
 sudo ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx
