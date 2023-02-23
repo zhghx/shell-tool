@@ -62,7 +62,7 @@ sudo tar -zxvf ./${NGINX_DIR}.tar.gz
 
 cd ./${NGINX_DIR}
 
-sudo ./configure --with-http_ssl_module
+sudo ./configure --with-http_ssl_module --with-http_v2_module
 
 sudo make
 sudo make install
