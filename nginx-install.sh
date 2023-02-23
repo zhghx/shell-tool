@@ -32,21 +32,28 @@
 # bash <(curl -sL https://raw.githubusercontent.com/zhghx/shell-tool/main/nginx-install.sh)
 ######## Run Bash ########
 
-cd ~
-
 NGINX_DIR=nginx-1.22.1
 
-sudo rm -rf /usr/local/nginx
-sudo rm -rf /usr/local/nginx/sbin/nginx
-sudo rm -rf /usr/local/nginx/modules
-sudo rm -rf /usr/local/nginx/conf
-sudo rm -rf /usr/local/nginx/conf/nginx.conf
-sudo rm -rf /usr/local/nginx/logs/nginx.pid
-sudo rm -rf /usr/local/nginx/logs/error.log
-sudo rm -rf /usr/local/nginx/logs/access.log
+deleteDownloadFile() {
+    sudo rm -rf ~/${NGINX_DIR}
+    sudo rm -rf ~/${NGINX_DIR}.tar.gz
+}
 
-sudo rm -rf ./${NGINX_DIR}
-sudo rm -rf ./${NGINX_DIR}.tar.gz
+resetNginxFile() {
+    sudo rm -rf /usr/local/nginx
+    sudo rm -rf /usr/local/nginx/sbin/nginx
+    sudo rm -rf /usr/local/nginx/modules
+    sudo rm -rf /usr/local/nginx/conf
+    sudo rm -rf /usr/local/nginx/conf/nginx.conf
+    sudo rm -rf /usr/local/nginx/logs/nginx.pid
+    sudo rm -rf /usr/local/nginx/logs/error.log
+    sudo rm -rf /usr/local/nginx/logs/access.log
+}
+
+cd ~
+
+deleteDownloadFile
+resetNginxFile
 
 wget http://nginx.org/download/${NGINX_DIR}.tar.gz
 
@@ -57,7 +64,6 @@ cd ./${NGINX_DIR}
 sudo ./configure --with-http_ssl_module
 
 sudo make
+sudo make install
 
-
-
-
+deleteDownloadFile
