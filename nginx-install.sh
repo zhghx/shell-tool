@@ -32,7 +32,7 @@
 # bash <(curl -sL https://raw.githubusercontent.com/zhghx/shell-tool/main/nginx-install.sh)
 ######## Run Bash ########
 
-NGINX_DIR=nginx-1.22.1
+NGINX_DIR=nginx-1.18.0
 
 deleteDownloadFile() {
     sudo rm -rf ~/${NGINX_DIR}
