@@ -13,10 +13,13 @@ cd ~
 
 NGINX_DIR=nginx-1.22.1
 
+rm -rf ./${NGINX_DIR}
+rm -rf ./${NGINX_DIR}.tar.gz
+
 wget http://nginx.org/download/${NGINX_DIR}.tar.gz
 
-tar -zxvf ./${NGINX_DIR}.tar.gz
+sudo tar -zxvf ./${NGINX_DIR}.tar.gz
 
 cd ./${NGINX_DIR}
 
-./configure --with-http_ssl_module
+sudo ./configure --with-http_ssl_module
