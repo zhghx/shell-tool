@@ -27,6 +27,10 @@ JSON_PATH=${JSON_PATH:-/usr/local/etc/v2ray}
 # Set this variable only if you want this script to check all the systemd unit file:
 # export check_all_service_files='yes'
 
+######## Run Bash ########
+# bash <(curl -sL https://raw.githubusercontent.com/zhghx/shell-tool/main/v2ray-install.sh)
+######## Run Bash ########
+
 curl() {
     $(type -P curl) -L -q --retry 5 --retry-delay 10 --retry-max-time 60 "$@"
 }
