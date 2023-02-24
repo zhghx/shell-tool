@@ -265,7 +265,7 @@ server {
     server_name ${DOMAIN};
     charset utf-8;
 
-    # ssl配置
+    # ssl config
     ssl_protocols TLSv1.1 TLSv1.2;
     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
     ssl_ecdh_curve secp384r1;
