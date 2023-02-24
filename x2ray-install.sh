@@ -250,7 +250,7 @@ getData() {
         echo " Xray一键脚本，运行之前请确认如下条件已经具备："
         colorEcho ${YELLOW} "  1. 一个伪装域名"
         colorEcho ${YELLOW} "  2. 伪装域名DNS解析指向当前服务器ip（${IP}）"
-        colorEcho ${BLUE} "  3. 如果/root目录下有 xray.pem 和 xray.key 证书密钥文件，无需理会条件2"
+        colorEcho ${BLUE} "  3. 如果/root目录下有 xray.crt 和 xray.key 证书密钥文件，无需理会条件2"
         echo " "
         read -p " 确认满足按y，按其他退出脚本：" answer
         if [[ "${answer,,}" != "y" ]]; then
@@ -271,9 +271,9 @@ getData() {
         colorEcho ${BLUE}  " 伪装域名(host)：$DOMAIN"
 
         echo ""
-        if [[ -f ~/xray.pem && -f ~/xray.key ]]; then
+        if [[ -f ~/xray.crt && -f ~/xray.key ]]; then
             colorEcho ${BLUE}  " 检测到自有证书，将使用其部署"
-            CERT_FILE="/usr/local/etc/xray/${DOMAIN}.pem"
+            CERT_FILE="/usr/local/etc/xray/${DOMAIN}.crt"
             KEY_FILE="/usr/local/etc/xray/${DOMAIN}.key"
         else
             resolve=`curl -sL ipget.net/?ip=${DOMAIN}`
@@ -571,7 +571,7 @@ getCert() {
             colorEcho $RED " 获取证书失败，请复制上面的红色文字到 Github Issues 反馈"
             exit 1
         }
-        CERT_FILE="/usr/local/etc/xray/${DOMAIN}.pem"
+        CERT_FILE="/usr/local/etc/xray/${DOMAIN}.crt"
         KEY_FILE="/usr/local/etc/xray/${DOMAIN}.key"
         ~/.acme.sh/acme.sh  --install-cert -d $DOMAIN --ecc \
             --key-file       $KEY_FILE  \
@@ -582,7 +582,7 @@ getCert() {
             exit 1
         }
     else
-        cp ~/xray.pem /usr/local/etc/xray/${DOMAIN}.pem
+        cp ~/xray.crt /usr/local/etc/xray/${DOMAIN}.crt
         cp ~/xray.key /usr/local/etc/xray/${DOMAIN}.key
     fi
 }
