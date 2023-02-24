@@ -79,6 +79,7 @@ downloadFile() {
 }
 
 copyCertificates() {
+    mkdir -p ${CERTIFICATES_DIR}
     cp ~/xray.crt ${CERTIFICATES_DIR}/${DOMAIN}.crt
     cp ~/xray.key ${CERTIFICATES_DIR}/${DOMAIN}.key
 }
@@ -182,8 +183,8 @@ configNginx() {
     mkdir -p ${NGINX_CONFIG_DIR}/conf.d
 
     if [[ "$ALLOW_SPIDER" = "n" ]]; then
-        echo 'User-Agent: *' >${NGINX_DEF_DIR}/html/html/robots.txt
-        echo 'Disallow: /' >>${NGINX_DEF_DIR}/html/html/robots.txt
+        echo 'User-Agent: *' >${NGINX_DEF_DIR}/html/robots.txt
+        echo 'Disallow: /' >>${NGINX_DEF_DIR}/html/robots.txt
         ROBOT_CONFIG="    location = /robots.txt {}"
     else
         ROBOT_CONFIG=""
