@@ -252,7 +252,7 @@ PrivateTmp=true
 WantedBy=multi-user.target
 
 EOF
-    systemctl enable nginx.service
+
 }
 
 cd ~
