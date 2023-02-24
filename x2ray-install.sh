@@ -1384,7 +1384,7 @@ install() {
         exit 1
     fi
 
-    installNginx
+#    installNginx
     setFirewall
     if [[ "$TLS" = "true" || "$XTLS" = "true" ]]; then
         getCert

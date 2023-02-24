@@ -275,4 +275,6 @@ copyCertificates
 
 configNginx
 
+setSystemctl
+
 sudo ln -s ${NGINX_DEF_SBIN} ${NGINX_BIN_LINK}
