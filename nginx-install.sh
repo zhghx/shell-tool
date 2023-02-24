@@ -37,16 +37,16 @@ NGINX_DIR=nginx-1.22.1
 
 # *****************************************************
 # *********************  PARAM  ***********************
-DOMAIN="www.haoxuan.click"
-REMOTE_HOST="maimai.sega.jp"
-PROXY_URL="https://maimai.sega.jp"
-ALLOW_SPIDER="n"
-TLS="true"
-WS="true"
-XTLS="true"
-PORT="443"
-XPORT="55555"
-WSPATH="/pkchkejqbf"
+DOMAIN="www.haoxuan.click"          # 有证书得域名
+REMOTE_HOST="maimai.sega.jp"        # 替换域名
+PROXY_URL="https://maimai.sega.jp"  # 代理地址
+ALLOW_SPIDER="n"                    # 是否允许爬虫
+TLS="true"                          # 支持TLS协议
+WS="true"                           # 支持WS协议
+XTLS="true"                         # 支持XTLS协议
+PORT="443"                          # SSL端口
+XPORT="55555"                       # Xray端口
+WSPATH="/pkchkejqbf"                # Xray Path
 # *********************  PARAM  ***********************
 # *****************************************************
 
@@ -270,8 +270,6 @@ sudo make
 sudo make install
 
 deleteDownloadFile
-
-#resetNginxConfig
 
 copyCertificates
 
