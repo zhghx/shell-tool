@@ -38,6 +38,7 @@ NGINX_DIR=nginx-1.22.1
 # *****************************************************
 # *********************  PARAM  ***********************
 DOMAIN="www.haoxuan.click"
+REMOTE_HOST="maimai.sega.jp"
 PROXY_URL="https://maimai.sega.jp"
 ALLOW_SPIDER="n"
 TLS="true"
