@@ -37,16 +37,16 @@ NGINX_DIR=nginx-1.22.1
 
 # *****************************************************
 # *********************  PARAM  ***********************
-DOMAIN="www.haoxuan.click"          # 有证书得域名
-REMOTE_HOST="maimai.sega.jp"        # 替换域名
-PROXY_URL="https://maimai.sega.jp"  # 代理地址
-ALLOW_SPIDER="n"                    # 是否允许爬虫
-TLS="true"                          # 支持TLS协议
-WS="true"                           # 支持WS协议
-XTLS="true"                         # 支持XTLS协议
-PORT="443"                          # SSL端口
-XPORT="55555"                       # Xray端口
-WSPATH="/pkchkejqbf"                # Xray Path
+DOMAIN="www.haoxuan.click"         # 有证书得域名
+REMOTE_HOST="maimai.sega.jp"       # 替换域名
+PROXY_URL="https://maimai.sega.jp" # 代理地址
+ALLOW_SPIDER="n"                   # 是否允许爬虫
+TLS="true"                         # 支持TLS协议
+WS="true"                          # 支持WS协议
+XTLS="true"                        # 支持XTLS协议
+PORT="443"                         # SSL端口
+XPORT="55555"                      # Xray端口
+WSPATH="/pkchkejqbf"               # Xray Path
 # *********************  PARAM  ***********************
 # *****************************************************
 
@@ -252,6 +252,7 @@ PrivateTmp=true
 WantedBy=multi-user.target
 
 EOF
+    systemctl enable nginx.service
 }
 
 cd ~
