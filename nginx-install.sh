@@ -252,7 +252,12 @@ PrivateTmp=true
 WantedBy=multi-user.target
 
 EOF
+    systemctl daemon-reload
+    # systemctl enable nginx.service
 
+    #root@ip-172-31-11-16:~# systemctl enable nginx.service
+    #Synchronizing state of nginx.service with SysV service script with /lib/systemd/systemd-sysv-install.
+    #Executing: /lib/systemd/systemd-sysv-install enable nginx
 }
 
 cd ~

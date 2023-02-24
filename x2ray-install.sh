@@ -1386,10 +1386,10 @@ install() {
 
 #    installNginx
     setFirewall
-    if [[ "$TLS" = "true" || "$XTLS" = "true" ]]; then
-        getCert
-    fi
-    configNginx
+#    if [[ "$TLS" = "true" || "$XTLS" = "true" ]]; then
+#        getCert
+#    fi
+#    configNginx
 
     colorEcho $BLUE " 安装Xray..."
     getVersion
