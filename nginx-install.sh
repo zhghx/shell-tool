@@ -78,7 +78,7 @@ downloadFile() {
     wget http://nginx.org/download/${NGINX_DIR}.tar.gz
 }
 
-copyCertificates(){
+copyCertificates() {
     cp ~/xray.crt ${CERTIFICATES_DIR}/${DOMAIN}.crt
     cp ~/xray.key ${CERTIFICATES_DIR}/${DOMAIN}.key
 }
@@ -348,6 +348,10 @@ sudo make install
 
 deleteDownloadFile
 
-resetNginxConfig
+#resetNginxConfig
+
+copyCertificates
+
+configNginx
 
 sudo ln -s ${NGINX_DEF_SBIN} ${NGINX_BIN_LINK}
