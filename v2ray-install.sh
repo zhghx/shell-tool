@@ -637,3 +637,56 @@ main() {
 }
 
 main "$@"
+
+##############################################################
+#info: Installing V2Ray v5.3.0 for x86_64
+ #Downloading V2Ray archive: https://github.com/v2fly/v2ray-core/releases/download/v5.3.0/v2ray-linux-64.zip
+ #  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+ #                                 Dload  Upload   Total   Spent    Left  Speed
+ #  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+ #100 11.1M  100 11.1M    0     0  15.7M      0 --:--:-- --:--:-- --:--:-- 41.3M
+ #Downloading verification file for V2Ray archive: https://github.com/v2fly/v2ray-core/releases/download/v5.3.0/v2ray-linux-64.zip.dgst
+ #info: Extract the V2Ray package to /tmp/tmp.ijzf1d4xp4 and prepare it for installation.
+ #info: Systemd service files have been installed successfully!
+ #warning: The following are the actual parameters for the v2ray service startup.
+ #warning: Please make sure the configuration file path is correctly set.
+ ## /etc/systemd/system/v2ray.service
+ #[Unit]
+ #Description=V2Ray Service
+ #Documentation=https://www.v2fly.org/
+ #After=network.target nss-lookup.target
+ #
+ #[Service]
+ #User=nobody
+ #CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+ #AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+ #NoNewPrivileges=true
+ #ExecStart=/usr/local/bin/v2ray run -config /usr/local/etc/v2ray/config.json
+ #Restart=on-failure
+ #RestartPreventExitStatus=23
+ #
+ #[Install]
+ #WantedBy=multi-user.target
+ #
+ ## /etc/systemd/system/v2ray.service.d/10-donot_touch_single_conf.conf
+ ## In case you have a good reason to do so, duplicate this file in the same directory and make your customizes there.
+ ## Or all changes you made will be lost!  # Refer: https://www.freedesktop.org/software/systemd/man/systemd.unit.html
+ #[Service]
+ #ExecStart=
+ #ExecStart=/usr/local/bin/v2ray run -config /usr/local/etc/v2ray/config.json
+ #
+ #installed: /usr/local/bin/v2ray
+ #installed: /usr/local/share/v2ray/geoip.dat
+ #installed: /usr/local/share/v2ray/geosite.dat
+ #installed: /usr/local/etc/v2ray/config.json
+ #installed: /var/log/v2ray/
+ #installed: /var/log/v2ray/access.log
+ #installed: /var/log/v2ray/error.log
+ #installed: /etc/systemd/system/v2ray.service
+ #installed: /etc/systemd/system/v2ray@.service
+ #removed: /tmp/tmp.ijzf1d4xp4
+ #info: V2Ray v5.3.0 is installed.
+ #You may need to execute a command to remove dependent software: apt purge curl unzip
+ #Please execute the command: systemctl enable v2ray; systemctl start v2ray#############################################################
+##############################################################
+
