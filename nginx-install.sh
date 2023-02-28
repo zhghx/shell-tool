@@ -9,7 +9,7 @@
 # --with-pcre-jit \
 # --add-module=/home/work/progam/openresry/ngx_openresty-1.9.7.1/moudels/upstream-fair/
 
-#Configuration summary
+#Configuration summary info
 #  + using system PCRE library
 #  + using system OpenSSL library
 #  + using system zlib library
